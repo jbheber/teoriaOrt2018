@@ -41,7 +41,7 @@ sust_mult xs (Rec id e1) = Rec id (sust_mult (filter (\(id2,exp) -> id2 /= id ) 
 sust_rama::[(Id, Exp)]->Rama-> Rama
 sust_rama = \xs (id, (ids, exp)) -> (id, (ids, (sust_mult (filter (\(id2,exp2) -> not (elem id2 ids)) xs) exp)))
 
-evalCD :: Exp -> ExpCD
+evalCD::Exp->ExpCD
 evalCD = \e -> case e of { 
         C c -> CCD c [];
         Lam z y -> LamCD z y;
@@ -64,4 +64,10 @@ evalCD = \e -> case e of {
             LamCD id x -> error "No evalua a un Constructor";
         };
         V y -> error "Variable libre";
+}
+
+evalV::Exp->ExpV
+evalV = \e -> case (evalCD e) of {
+    LamCD ids exp -> LamV ids exp;
+    CCD id exps -> CV id (map evalV exps);
 }
