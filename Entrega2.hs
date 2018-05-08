@@ -71,3 +71,24 @@ evalV = \e -> case (evalCD e) of {
     LamCD ids exp -> LamV ids exp;
     CCD id exps -> CV id (map evalV exps);
 }
+
+verificarRepetidos::Exp->Bool
+verificarRepetidos (V id) = True
+verificarRepetidos (C id) = True
+verificarRepetidos (Lam ids exp) = verificarRepIds ids && verificarRepetidos exp
+verificarRepetidos (App exp exps) = (verificarRepetidos exp) && checkArray (map (verificarRepetidos) exps)
+verificarRepetidos (Case exp ramas) = (verificarRepetidos exp) && (verificarRepRamas ramas)
+verificarRepetidos (Rec id exp) = verificarRepetidos exp
+
+verificarRepIds::[Id]->Bool
+verificarRepIds [] = True
+verificarRepIds [_] = True
+verificarRepIds (i:ids) = if elem i ids then False else verificarRepIds ids
+
+verificarRepRamas::[Rama]->Bool
+verificarRepRamas [] = True
+verificarRepRamas ((id,(ids, exp)):rs) = (verificarRepIds ids) && (verificarRepetidos exp) && (verificarRepRamas rs)
+
+checkArray::[Bool] -> Bool
+checkArray [] = True
+checkArray (x:xs) = x && checkArray xs
