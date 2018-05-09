@@ -111,11 +111,14 @@ suma = Rec "suma" (Lam ["n", "m"] (Case (V "m") [("O", ([], V "n")), ("S", (["x"
 largo::Exp
 largo = Rec "largo" (Lam ["xs"] (Case (V "xs") [("[]", ([], C "O")), (":", (["z","zs"], (App (C "S") [(App (V "largo") [V "zs"])])))]))
 
+mapChi::Exp
+mapChi = Rec "mapChi" (Lam ["f", "xs"] (Case (V "xs") [("[]", ([], (C "[]"))), (":", (["z", "zs"], App (C ":") [App (V "f") [V "z"], App (V "mapChi") [V "f", V "zs"]]))]))
+
 -- Auxiliares
 naturalChi::Int->Exp
 naturalChi 0 = C "O"
 naturalChi n = App (C "S") [naturalChi(n-1)]
 
-crearListaChi::Int->Exp
-crearListaChi 0 = C "[]"
-crearListaChi n = App (C ":") [naturalChi(0), crearListaChi(n-1)]
+crearListaChi::[Int]->Exp
+crearListaChi [] = C "[]"
+crearListaChi (x:xs) = App (C ":") [naturalChi x, crearListaChi xs]
