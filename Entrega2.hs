@@ -105,6 +105,8 @@ par = Rec "par" (Lam ["n"] (Case (V "n") [("O", ([], true)), ("S", (["x"], App n
 notChi::Exp
 notChi = Lam ["n"] (Case (V "n") [("True", ([], false)), ("False", ([], true))])
 
+suma::Exp
+suma = Rec "suma" (Lam ["n", "m"] (Case (V "m") [("O", ([], V "n")), ("S", (["x"], (App (C "S") [(App (V "suma") [V "n", V "x"])])))]))
 -- Auxiliares
 naturalChi::Int->Exp
 naturalChi 0 = C "O"
