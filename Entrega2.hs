@@ -27,6 +27,12 @@ exp4 = Lam ["x"] exp3
 exp5::Exp
 exp5 = Lam ["y"] exp3
 
+false::Exp
+false = C "False"
+
+true::Exp
+true = C "True"
+
 sust_mult::[(Id, Exp)]->Exp->Exp
 sust_mult xs (V id) = case (lookup id xs) of {
     Just t -> t;
@@ -45,7 +51,7 @@ evalCD::Exp->ExpCD
 evalCD = \e -> case e of { 
         C c -> CCD c [];
         Lam z y -> LamCD z y;
-        Rec i exp -> evalCD (sust_mult [(i, exp)] (Rec i exp));
+        Rec i exp -> evalCD (sust_mult [(i, e)] (exp));
         App e1 exps -> case (evalCD e1) of {
             LamCD ids e3 -> case (length ids == length exps) of {
                 False -> error "no son del mismo largo";
@@ -92,3 +98,14 @@ verificarRepRamas ((id,(ids, exp)):rs) = (verificarRepIds ids) && (verificarRepe
 checkArray::[Bool] -> Bool
 checkArray [] = True
 checkArray (x:xs) = x && checkArray xs
+
+par::Exp
+par = Rec "par" (Lam ["n"] (Case (V "n") [("O", ([], true)), ("S", (["x"], App notChi [(App (V "par") [V "x"])]))]))
+
+notChi::Exp
+notChi = Lam ["n"] (Case (V "n") [("True", ([], false)), ("False", ([], true))])
+
+-- Auxiliares
+naturalChi::Int->Exp
+naturalChi 0 = C "O"
+naturalChi n = App (C "S") [naturalChi(n-1)]
