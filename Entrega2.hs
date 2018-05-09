@@ -107,7 +107,15 @@ notChi = Lam ["n"] (Case (V "n") [("True", ([], false)), ("False", ([], true))])
 
 suma::Exp
 suma = Rec "suma" (Lam ["n", "m"] (Case (V "m") [("O", ([], V "n")), ("S", (["x"], (App (C "S") [(App (V "suma") [V "n", V "x"])])))]))
+
+largo::Exp
+largo = Rec "largo" (Lam ["xs"] (Case (V "xs") [("[]", ([], C "O")), (":", (["z","zs"], (App (C "S") [(App (V "largo") [V "zs"])])))]))
+
 -- Auxiliares
 naturalChi::Int->Exp
 naturalChi 0 = C "O"
 naturalChi n = App (C "S") [naturalChi(n-1)]
+
+crearListaChi::Int->Exp
+crearListaChi 0 = C "[]"
+crearListaChi n = App (C ":") [naturalChi(0), crearListaChi(n-1)]
