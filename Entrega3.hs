@@ -12,10 +12,24 @@ type Rama = (Id, ([Id], Prog))
 type Mem = [(Id, Val)]
 type Id = String
 
---Funciones auxiliares
+-- Memoria
 
+lookupMemory :: Mem -> Id -> Val
+lookupMemory [] id = Null
+lookupMemory ((x,y):xs) id = if (x == id) then y else lookupMemory xs id
+
+update :: Mem -> [(Id, Val)] -> Mem
+update m ls = ls ++ m
+
+---
+--  Programa
+
+eval :: Mem -> Exp -> Val
+eval = \memory -> \e -> case e of {
+    V id -> lookupMemory memory id;
+    C id exps -> CV id (map (eval memory) exps);
+};
+
+---
 notb :: Prog
 notb = Case "b" [("True", ([], Ass [("b", C "False" [])])), ("False", ([], Ass [("b", C "True" [])]))]
-       
-pos :: Prog
-pos = Case "n" [("O", ([], Ass [("x", C "False" [])])), ("S", (["y"], Ass [("z", C "True" [])]))]
