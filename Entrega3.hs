@@ -51,3 +51,27 @@ run m (p:ps) = case (step m (p:ps)) of {
     (m2, p2) -> run m2 p2;
 };
 ---
+-- Funciones
+false :: Exp
+false = C "F" []
+
+true :: Exp
+true = C "V" []
+
+memoriaTest :: Mem
+memoriaTest = [("n", CV "S" [CV "O" []])]
+
+notB :: Prog
+notB = [Case "b" [("V", ([], [Ass [("b", false)]])), ("F", ([], [Ass [("b", true)]]))]]
+
+par :: Prog
+par = [
+    Ass [("b", true)], 
+    While "n" [
+        ("S", 
+            (["x"], 
+                (notB ++ [Ass [("n", V "x")]])
+            )
+        )
+    ]]
+---
