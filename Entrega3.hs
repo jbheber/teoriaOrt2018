@@ -44,4 +44,10 @@ step m ((While id ramas):ps) = case lookupMemory m id of {
    };
    Null -> error "La variable no se encuentra en memoria"
 };
+
+run :: Mem -> Prog -> Mem
+run m [] = m
+run m p = case (step m p) of {
+    (m2, p2) -> run m2 p2;
+};
 ---
