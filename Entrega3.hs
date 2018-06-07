@@ -58,8 +58,17 @@ false = C "F" []
 true :: Exp
 true = C "V" []
 
+cero :: Val
+cero = CV "0" []
+
+uno :: Val
+uno = CV "S" [cero]
+
+dos :: Val
+dos = CV "S" [uno]
+
 memoriaTest :: Mem
-memoriaTest = [("n", CV "S" [CV "O" []])]
+memoriaTest = [("n", dos), ("m", uno)]
 
 notB :: Prog
 notB = [Case "b" [("V", ([], [Ass [("b", false)]])), ("F", ([], [Ass [("b", true)]]))]]
@@ -71,6 +80,16 @@ par = [
         ("S", 
             (["x"], 
                 (notB ++ [Ass [("n", V "x")]])
+            )
+        )
+    ]]
+
+mas :: Prog
+mas = [
+    While "n" [
+        ("S", 
+            (["x"], 
+                [Ass [("m", C "S" [V "m"]),("n", V "x")]]
             )
         )
     ]]
