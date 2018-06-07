@@ -47,7 +47,7 @@ step m ((While id ramas):ps) = case lookupMemory m id of {
 
 run :: Mem -> Prog -> Mem
 run m [] = m
-run m p = case (step m p) of {
+run m (p:ps) = case (step m (p:ps)) of {
     (m2, p2) -> run m2 p2;
 };
 ---
