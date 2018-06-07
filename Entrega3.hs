@@ -4,7 +4,7 @@ data Val = CV Id [Val] | Null
 data Exp = V Id | C Id [Exp]
  deriving (Show, Eq)
 
-data Instr = Ass [(Id, Exp)] |Case Id [Rama] | While Id [Rama]
+data Instr = Ass [(Id, Exp)] | Case Id [Rama] | While Id [Rama]
  deriving (Show, Eq)
 
 type Prog = [Instr]
@@ -25,11 +25,23 @@ update m ls = ls ++ m
 --  Programa
 
 eval :: Mem -> Exp -> Val
-eval = \memory -> \e -> case e of {
-    V id -> lookupMemory memory id;
-    C id exps -> CV id (map (eval memory) exps);
-};
+eval m (V id) = lookupMemory m id
+eval m (C id exps) = CV id (map (eval m) exps)
 
+step :: Mem -> Prog -> (Mem, Prog)
+step m ((Ass as):ps) = (update m (map (\(id, exp) -> (id, eval m exp)) as), ps)
+step m ((Case id ramas):ps) = case lookupMemory m id of {
+    CV id2 vs -> case lookup id2 ramas of {
+       Just (ids, prog) -> (update m (zip ids vs), prog ++ ps);
+       Nothing -> error "El id no esta en las ramas"
+    };
+    Null -> error "La variable no se encuentra en memoria"
+};
+step m ((While id ramas):ps) = case lookupMemory m id of {
+    CV id2 vs -> case lookup id2 ramas of {
+        Just (ids, prog) -> ((update m (zip ids vs)), (prog++[(While id ramas)]++ps));
+        Nothing -> (m, ps)
+   };
+   Null -> error "La variable no se encuentra en memoria"
+};
 ---
-notb :: Prog
-notb = Case "b" [("True", ([], Ass [("b", C "False" [])])), ("False", ([], Ass [("b", C "True" [])]))]
