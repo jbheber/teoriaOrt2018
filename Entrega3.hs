@@ -59,7 +59,7 @@ true :: Exp
 true = C "V" []
 
 cero :: Val
-cero = CV "0" []
+cero = CV "O" []
 
 uno :: Val
 uno = CV "S" [cero]
@@ -67,8 +67,17 @@ uno = CV "S" [cero]
 dos :: Val
 dos = CV "S" [uno]
 
+listaVacia :: Val
+listaVacia = CV "[]" []
+
+listaUnElem :: Val
+listaUnElem = CV ":" [(CV "a" []), (listaVacia)]
+
+listaDosElem :: Val
+listaDosElem = CV ":" [(CV "b" []), (listaUnElem)]
+
 memoriaTest :: Mem
-memoriaTest = [("n", dos), ("m", uno)]
+memoriaTest = [("n", dos), ("m", uno), ("xs", listaDosElem), ("b", CV "T" [])]
 
 notB :: Prog
 notB = [Case "b" [("V", ([], [Ass [("b", false)]])), ("F", ([], [Ass [("b", true)]]))]]
@@ -93,4 +102,65 @@ mas = [
             )
         )
     ]]
+
+largo :: Prog
+largo = [
+    Ass [("ret", C "O" [])],
+    While "xs" [
+        (":",
+            (["y","ys"],
+                [ Ass [("ret", C "S" [V "ret"]), ("xs", V "ys")]]
+            )
+        )
+    ]]
+
+igualdad :: Prog
+igualdad = [
+    Ass [("b", true)],
+    Case "m" [
+        ("O", 
+            ([], [(Case "n" [
+                    ("O",
+                        ([], [Ass [("b", true)]])
+                    ),
+                    ("S",
+                        (["x"], [Ass [("b", false)]])
+                    )
+                ])
+            ])
+        ),
+        ("S",
+            (["x"], [
+                While "m" [
+                    ("S",
+                        (["y"], [
+                            (Case "n" [
+                                ("O",
+                                    ([], [
+                                        Ass [("b", false)],
+                                        Ass [("m", C "O" [])]
+                                    ])
+                                ),
+                                ("S",
+                                    (["z"], [
+                                        Ass [("m", V "y")],
+                                        Ass [("n", V "z")]
+                                    ])
+                                )
+                            ]),
+                            (Case "n" [
+                                ("O",
+                                    ([], [Ass [("b", V "b")]])
+                                ),
+                                ("S",
+                                    (["t"], [Ass [("b", false)]])
+                                )
+                            ])
+                        ])
+                    )
+                ]
+            ])
+        )
+    ]]
+
 ---
